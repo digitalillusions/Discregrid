@@ -38,3 +38,5 @@ option(BUILD_CMD_EXECUTABLE "Build command line executable" ON)
 if(BUILD_CMD_EXECUTABLE)
 	add_subdirectory(cmd)
 endif(BUILD_CMD_EXECUTABLE)
+
+add_subdirectory(pydiscregrid)

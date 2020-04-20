@@ -91,12 +91,12 @@ endif()
 find_package(Eigen3 REQUIRED)
 
 # Set include directories.
-include_directories(
-	include
-	include/Discregrid
-	${EIGEN3_INCLUDE_DIR}
-	../extern
-)
+# include_directories(
+# 	include
+# 	include/Discregrid
+# 	${EIGEN3_INCLUDE_DIR}
+# 	../extern
+# )
 
 # Disable stupid MSVC compiler warnings.
 if(WIN32)
@@ -129,8 +129,17 @@ endif()
 #add_dependencies(Discregrid
 #)
 
+target_include_directories(Discregrid
+		PUBLIC include
+		PRIVATE include/Discregrid
+		PUBLIC ${EIGEN3_INCLUDE_DIR}
+		PRIVATE ../extern
+)
+
 # Set link libraries.
 target_link_libraries(Discregrid
+		PRIVATE ${OpenMP_gomp_LIBRARY}
+		PRIVATE ${OpenMP_omp_LIBRARY}
 )
 
 install(TARGETS Discregrid
