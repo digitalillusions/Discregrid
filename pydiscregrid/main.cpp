@@ -46,5 +46,16 @@ PYBIND11_MODULE(pydiscregrid, m){
             .def(py::init<Discregrid::TriangleMesh const&, bool>(), "mesh"_a, "precompute_normals"_a=true)
             .def("distance", &Discregrid::MeshDistance::distance, "x"_a, "nearestPoint"_a= nullptr, "nearestFace"_a= nullptr, "nearestEntity"_a= nullptr)
             .def("signedDistance", &Discregrid::MeshDistance::signedDistance, "x"_a)
+            .def("signedDistance", [](const Discregrid::MeshDistance& obj, py::array_t<double> arr){
+                auto r = arr.unchecked<2>();
+                if (r.shape(1) != 3) throw std::domain_error("error: dim(1) != 3");
+                const py::array_t<double> a = arr[py::make_tuple(py::ellipsis(), 0)].cast<py::array_t<double>>();
+                const py::array_t<double> b = arr[py::make_tuple(py::ellipsis(), 1)].cast<py::array_t<double>>();
+                const py::array_t<double> c = arr[py::make_tuple(py::ellipsis(), 2)].cast<py::array_t<double>>();
+                return py::vectorize([obj](const double x, const double y, const double z){
+                    const Eigen::Vector3d vec{x,y,z};
+                    return obj.signedDistance(vec);
+                })(a,b,c);
+            })
             .def("signedDistanceCached", &Discregrid::MeshDistance::signedDistance, "x"_a);
 }

@@ -2,6 +2,7 @@ import pydiscregrid
 import numpy as np
 import meshio
 
+
 def main():
     print("Loading mesh...")
     mesh = meshio.read("C:/Users/Stefan/Downloads/treefrog_45_cut.stl")
@@ -24,9 +25,9 @@ def main():
     print(f"\tConstructed {grid.nCells()} cells.")
 
     print(f"Generate Discretization...")
-
     grid.addSDF(md, True)
     print(f"\tDone.")
+
 
 if __name__ == '__main__':
     main()
