@@ -26,9 +26,10 @@ class CMakeExtension(Extension):
 class CMakeBuild(build_ext):
     def run(self):
         try:
+            out = subprocess.check_output(['git', '--version'])
             out = subprocess.check_output(['cmake', '--version'])
         except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
+            raise RuntimeError("CMake and git must be in PATH to build the following extensions: " +
                                ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
@@ -47,6 +48,8 @@ class CMakeBuild(build_ext):
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
+
+        cmake_args += ['-DEIGEN3_INCLUDE_DIR={}'.format(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pydiscregrid/eigen'))]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -69,6 +72,9 @@ class CMakeBuild(build_ext):
                                                               self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+
+        subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
+
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.', "--target", "pydiscregrid"] + build_args, cwd=self.build_temp)
 
