@@ -49,7 +49,8 @@ class CMakeBuild(build_ext):
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
-        cmake_args += ['-DEIGEN3_INCLUDE_DIR={}'.format(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pydiscregrid/eigen'))]
+        sourcedir = os.path.dirname(os.path.abspath(__file__))
+        cmake_args += ['-DEIGEN3_INCLUDE_DIR={}'.format(os.path.join(sourcedir, 'pydiscregrid/eigen'))]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -73,7 +74,7 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
 
-        subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'])
+        subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'], cwd=sourcedir)
 
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.', "--target", "pydiscregrid"] + build_args, cwd=self.build_temp)
