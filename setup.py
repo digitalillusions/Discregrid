@@ -84,6 +84,8 @@ class CMakeBuild(build_ext):
             eigen_url = "https://gitlab.com/libeigen/eigen.git"
             eigen_ver = "3.3.7"
             eigen_dir = os.path.join(sourcedir, 'pydiscregrid/eigen')
+            print(f"Pybind directory contents {os.listdir(pybind_dir)}")
+            print(f"Eigen directory contents {os.listdir(eigen_dir)}")
             subprocess.check_call(['git', 'clone', pybind_url, '--branch', pybind_ver, '--single-branch', pybind_dir], cwd=sourcedir)
             subprocess.check_call(['git', 'clone', eigen_url, '--branch', eigen_ver, '--single-branch', eigen_dir], cwd=sourcedir)
 
