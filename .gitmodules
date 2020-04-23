@@ -1,3 +1,6 @@
 [submodule "pydiscregrid/pybind11"]
 	path = pydiscregrid/pybind11
 	url = https://github.com/pybind/pybind11.git
+[submodule "pydiscregrid/eigen"]
+	path = pydiscregrid/eigen
+	url = https://gitlab.com/libeigen/eigen.git
