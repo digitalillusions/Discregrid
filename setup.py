@@ -17,6 +17,18 @@ args, other_args = parser.parse_known_args(sys.argv)
 cmake_clargs = args.cmake
 sys.argv = other_args
 
+sourcedir = os.path.dirname(os.path.abspath(__file__))
+
+pybind_url = "https://github.com/pybind/pybind11.git"
+pybind_ver = "v2.5.0"
+pybind_dir = os.path.join(sourcedir, 'pydiscregrid/pybind11')
+eigen_url = "https://gitlab.com/libeigen/eigen.git"
+eigen_ver = "3.3.7"
+eigen_dir = os.path.join(sourcedir, 'pydiscregrid/eigen')
+
+external_modules = {"pybind": {"url": pybind_url, "ver": pybind_ver, "dir": pybind_dir},
+                    "eigen": {"url": eigen_url, "ver": eigen_ver, "dir": eigen_dir}}
+
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
@@ -49,7 +61,6 @@ class CMakeBuild(build_ext):
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
-        sourcedir = os.path.dirname(os.path.abspath(__file__))
         cmake_args += ['-DEIGEN3_INCLUDE_DIR={}'.format(os.path.join(sourcedir, 'pydiscregrid/eigen'))]
 
         cfg = 'Debug' if self.debug else 'Release'
@@ -78,16 +89,11 @@ class CMakeBuild(build_ext):
         try:
             subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'], cwd=sourcedir)
         except subprocess.CalledProcessError:
-            pybind_url = "https://github.com/pybind/pybind11.git"
-            pybind_ver = "v2.5.0"
-            pybind_dir = os.path.join(sourcedir, 'pydiscregrid/pybind11')
-            eigen_url = "https://gitlab.com/libeigen/eigen.git"
-            eigen_ver = "3.3.7"
-            eigen_dir = os.path.join(sourcedir, 'pydiscregrid/eigen')
-            print(f"Pybind directory contents {os.listdir(pybind_dir)}")
-            print(f"Eigen directory contents {os.listdir(eigen_dir)}")
-            subprocess.check_call(['git', 'clone', pybind_url, '--branch', pybind_ver, '--single-branch', pybind_dir], cwd=sourcedir)
-            subprocess.check_call(['git', 'clone', eigen_url, '--branch', eigen_ver, '--single-branch', eigen_dir], cwd=sourcedir)
+            for module in external_modules:
+                if len(os.listdir(external_modules[module]["dir"])) > 0:
+                    continue
+                url, ver, dir = external_modules[module]["url"], external_modules[module]["ver"], external_modules[module]["dir"]
+                subprocess.check_call(['git', 'clone', url, '--branch', ver, '--single-branch', dir], cwd=sourcedir)
 
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.', "--target", "pydiscregrid"] + build_args, cwd=self.build_temp)
