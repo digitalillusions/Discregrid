@@ -74,7 +74,16 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
 
-        subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'], cwd=sourcedir)
+        # Update submodules if .git folder is present. Otherwise clone them manually
+        try:
+            subprocess.check_call(['git', 'submodule', 'update', '--init', '--recursive'], cwd=sourcedir)
+        except subprocess.CalledProcessError:
+            pybind_url = "https://github.com/pybind/pybind11.git"
+            pybind_ver = "v2.5.0"
+            eigen_url = "https://gitlab.com/libeigen/eigen.git"
+            eigen_ver = "3.3.7"
+            subprocess.check_call(['git', 'clone', pybind_url, '--branch', pybind_ver, '--single-branch', 'pydiscregrid/pybind11'], cwd=sourcedir)
+            subprocess.check_call(['git', 'clone', eigen_url, '--branch', eigen_ver, '--single-branch', 'pydiscregrid/eigen'], cwd=sourcedir)
 
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.', "--target", "pydiscregrid"] + build_args, cwd=self.build_temp)
