@@ -79,6 +79,10 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             build_args += ['--', '-j4']
 
+        # Add position independent code flags if using gcc on linux probably
+        if platform.system() == "Linux":
+            cmake_args += ['-DCMAKE_CXX_FLAGS=-fPIC', '-DCMAKE_C_FLAGS=-fPIC']
+
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
