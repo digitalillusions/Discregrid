@@ -57,5 +57,16 @@ PYBIND11_MODULE(pydiscregrid, m){
                     return obj.signedDistance(vec);
                 })(a,b,c);
             })
+            .def("signedDistanceNonVec", [](const Discregrid::MeshDistance& obj, py::array_t<double> arr){
+                auto r = arr.unchecked<2>();
+                if (r.shape(1) != 3) throw std::domain_error("error: dim(1) != 3");
+                py::array_t<double> sdf_values = py::array(py::dtype("d"), {r.shape(0)}, {});
+                auto s = sdf_values.mutable_unchecked<1>();
+                for (int i = 0; i < r.shape(0); ++i) {
+                    const Eigen::Vector3d vec{r(i, 0), r(i, 1), r(i, 2)};
+                    s(i) = obj.signedDistance(vec);
+                };
+                return sdf_values;
+            })
             .def("signedDistanceCached", &Discregrid::MeshDistance::signedDistance, "x"_a);
 }
