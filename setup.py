@@ -64,7 +64,9 @@ class CMakeBuild(build_ext):
         cmake_args += ['-DEIGEN3_INCLUDE_DIR={}'.format(os.path.join(sourcedir, 'pydiscregrid/eigen'))]
 
         cfg = 'Debug' if self.debug else 'Release'
-        build_args = ['--config', cfg]
+        # build_args = ['--config', cfg]
+        build_args = []
+        cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
 
         # Add cmake command line arguments
         if cmake_clargs is not None:
@@ -76,7 +78,7 @@ class CMakeBuild(build_ext):
                 cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
-            cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
+            # cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             build_args += ['--', '-j4']
 
         # Add position independent code flags if using gcc on linux probably
