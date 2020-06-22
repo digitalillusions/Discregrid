@@ -46,6 +46,23 @@ PYBIND11_MODULE(pydiscregrid, m){
             .def(py::init<Discregrid::TriangleMesh const&, bool>(), "mesh"_a, "precompute_normals"_a=true)
             .def("distance", &Discregrid::MeshDistance::distance, "x"_a, "nearestPoint"_a= nullptr, "nearestFace"_a= nullptr, "nearestEntity"_a= nullptr)
             .def("signedDistance", &Discregrid::MeshDistance::signedDistance, "x"_a)
+            .def("signedDistanceNormal", &Discregrid::MeshDistance::signedDistanceNormal, "x"_a)
+            .def("signedDistanceNormal", [](const Discregrid::MeshDistance& obj, py::array_t<double> arr){
+                auto r = arr.unchecked<2>();
+                if (r.shape(1) != 3) throw std::domain_error("error: dim(1) != 3");
+                py::array_t<double> sdf_values = py::array(py::dtype("d"), {r.shape(0), (ssize_t)4}, {});
+                auto s = sdf_values.mutable_unchecked<2>();
+                for (int i = 0; i < r.shape(0); ++i) {
+                    const Eigen::Vector3d vec{r(i, 0), r(i, 1), r(i, 2)};
+                    auto ret = obj.signedDistanceNormal(vec);
+                    s(i,0) = ret[0];
+                    s(i,1) = ret[1];
+                    s(i,2) = ret[2];
+                    s(i,3) = ret[3];
+                };
+                return sdf_values;
+            })
+
             .def("signedDistance", [](const Discregrid::MeshDistance& obj, py::array_t<double> arr){
                 auto r = arr.unchecked<2>();
                 if (r.shape(1) != 3) throw std::domain_error("error: dim(1) != 3");

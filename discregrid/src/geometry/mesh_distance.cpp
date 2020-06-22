@@ -239,6 +239,49 @@ MeshDistance::signedDistance(Vector3d const& x) const
 	return dist;
 }
 
+Eigen::Vector4d
+MeshDistance::signedDistanceNormal(const Vector3d &x) const {
+    unsigned int nf;
+    auto ne = NearestEntity{};
+    auto np = Vector3d{};
+    auto dist = distance(x, &np, &nf, &ne);
+
+    auto n = Vector3d{};
+    switch (ne)
+    {
+        case NearestEntity::VN0:
+            n = vertex_normal(m_mesh.faceVertex(nf, 0));
+            break;
+        case NearestEntity::VN1:
+            n = vertex_normal(m_mesh.faceVertex(nf, 1));
+            break;
+        case NearestEntity::VN2:
+            n = vertex_normal(m_mesh.faceVertex(nf, 2));
+            break;
+        case NearestEntity::EN0:
+            n = edge_normal({nf, 0});
+            break;
+        case NearestEntity::EN1:
+            n = edge_normal({nf, 1});
+            break;
+        case NearestEntity::EN2:
+            n = edge_normal({nf, 2});
+            break;
+        case NearestEntity::FN:
+            n = face_normal(nf);
+            break;
+        default:
+            n.setZero();
+            break;
+    }
+
+    if ((x - np).dot(n) < 0.0)
+        dist *= -1.0;
+
+    return Vector4d{dist, n[0], n[1], n[2]};
+
+}
+
 double
 MeshDistance::signedDistanceCached(Vector3d const & x) const
 {
@@ -307,5 +350,6 @@ MeshDistance::vertex_normal(unsigned int v) const
 	}
 	return n;
 }
+
 
 }
