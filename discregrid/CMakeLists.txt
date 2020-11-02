@@ -96,6 +96,7 @@ include_directories(
 	include/Discregrid
 	${EIGEN3_INCLUDE_DIR}
 	../extern
+	$<${APPLE}:${OpenMP_CXX_INCLUDE_DIR}>
 )
 
 # Disable stupid MSVC compiler warnings.
