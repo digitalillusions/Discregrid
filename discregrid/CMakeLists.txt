@@ -52,11 +52,7 @@ SOURCEGROUP(UTILITY)
 SOURCEGROUP(GEOMETRY)
 
 # OpenMP support.
-if(APPLE)
-	include(PatchOpenMPApple)
-else()
-	find_package(OpenMP REQUIRED)
-endif()
+find_package(OpenMP REQUIRED)
 
 if(OPENMP_FOUND)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -105,6 +101,8 @@ endif()
 
 # Set link libraries.
 target_link_libraries(Discregrid
+PUBLIC
+OpenMP::OpenMP_CXX
 )
 
 install(TARGETS Discregrid
