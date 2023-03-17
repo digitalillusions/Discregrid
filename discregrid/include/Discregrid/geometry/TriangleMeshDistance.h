@@ -81,6 +81,7 @@ namespace Discregrid
 	{
 		double distance = std::numeric_limits<double>::max();
 		Vec3d nearest_point;
+		Vec3d surface_normal = {-1, -1, -1}; // -1 indicates uninit normal
 		Discregrid::NearestEntity nearest_entity;
 		int triangle_id = -1;
 	};
@@ -303,6 +304,7 @@ inline Discregrid::Result Discregrid::TriangleMeshDistance::signed_distance(cons
 
 	const Vec3d u = p - result.nearest_point;
 	result.distance *= (u.dot(pseudonormal) >= 0.0) ? 1.0 : -1.0;
+	result.surface_normal = pseudonormal;
 
 	return result;
 }
