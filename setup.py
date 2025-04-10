@@ -20,7 +20,7 @@ sys.argv = other_args
 sourcedir = os.path.dirname(os.path.abspath(__file__))
 
 pybind_url = "https://github.com/pybind/pybind11.git"
-pybind_ver = "v2.5.0"
+pybind_ver = "v2.13.6"
 pybind_dir = os.path.join(sourcedir, 'pydiscregrid/pybind11')
 eigen_url = "https://gitlab.com/libeigen/eigen.git"
 eigen_ver = "3.3.7"
@@ -103,6 +103,9 @@ class CMakeBuild(build_ext):
 
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.', "--target", "pydiscregrid"] + build_args, cwd=self.build_temp)
+
+if not os.path.isdir('build'):
+    os.mkdir('build')
 
 setup(
     name='Discregrid',
